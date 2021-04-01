@@ -5,16 +5,24 @@ from modules.numberFormat import numberFormat
 
 data = scraperwiki.sqlite.select("* from source")
 new = pd.DataFrame(data)
+old = pd.read_csv('qld-covid.csv')
 
+#%%
 ## Pivot dataframe
 pivoted = new.pivot(index="date", columns="header")['count'].reset_index()
 pivoted = pivoted[['date', 'Interstate acquired',
        'Locally Acquired—close contact with confirmed case',
        'Locally Acquired—no known contact', 'Overseas acquired','Under investigation']]
-pivoted['date'] = pd.to_datetime(pivoted['date'])
-pivoted = pivoted.sort_values(by="date", ascending=True)
-pivoted.columns = ['Date', 'Interstate', 'Local', 'Local unknown', 'Overseas', 'Under investigation']
+pivoted = pivoted.append(old)
 
+pivoted['date'] = pd.to_datetime(pivoted['date'], format="%d/%m/%Y")
+
+#%%
+
+pivoted = pivoted.sort_values(by="date", ascending=True)
+#%%
+
+pivoted.columns = ['Date', 'Interstate', 'Local', 'Local unknown', 'Overseas', 'Under investigation']
 
 pivoted['Date'] = pivoted['Date'].dt.strftime('%Y-%m-%d')
 
@@ -30,6 +38,8 @@ for col in cols:
 # print(pivoted)
 
 last_date = pivoted.iloc[-1:]["Date"].values[0]
+
+#%%
 # print(last_date)
 def makeTestingLine(df):
 	
@@ -43,7 +53,7 @@ def makeTestingLine(df):
                 "minY": "0",
                 "maxY": "",
                 "xAxisDateFormat":"%b %d",
-                "tooltip":"<strong>{{#nicerdate}}{{/nicerdate}}</strong><br/>{{group}}: {{groupValue}}<br/>Total: {{total}}",
+                "tooltip":"<strong>{{#formatDate}}{{data.Date}}{{/formatDate}}</strong><br/>{{group}}: {{groupValue}}<br/>Total: {{total}}",
                 "margin-left": "50",
                 "margin-top": "30",
                 "margin-bottom": "20",

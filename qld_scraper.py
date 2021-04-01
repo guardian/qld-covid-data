@@ -11,26 +11,24 @@ url = 'https://www.qld.gov.au/health/conditions/health-alerts/coronavirus-covid-
 html = requests.get(url).content
 # historical = f'{data_path}/qld-historical.csv' 
 
+# ## SAVE HISTORICAL DATA TO SQL 
 
-## SAVE HISTORICAL DATA TO SQL 
-
-previous_data = f'{data_path}/qld-covid.csv'
-previous_data = pd.read_csv(previous_data)
-previous_data = previous_data.melt(id_vars = "date", value_vars =['Overseas acquired', 'Locally Acquired—close contact with confirmed case',
-      'Locally Acquired—no known contact','Interstate acquired', 'Under investigation', 'Total cases'])
-previous_data.columns = ['date', 'header', 'count']
-previous_data['date'] = pd.to_datetime(previous_data['date'])
-previous_data['date'] = previous_data['date'].dt.strftime('%d/%m/%Y')
-
-for row in previous_data.index:
-	newRow = {}
-	newRow["header"] = previous_data.loc[row, 'header']
-	newRow["count"] = str(previous_data.loc[row,'count'])
-	newRow["date"] = previous_data.loc[row,'date']
-	# print(newRow)
-	scraperwiki.sqlite.save(unique_keys=["header","date"], data=newRow, table_name="source")
+# # previous_data = f'{data_path}/'qld-covid.csv'
+# previous_data = pd.read_csv('qld-covid.csv')
+# previous_data = previous_data.melt(id_vars = "date", value_vars =['Overseas acquired', 'Locally Acquired—close contact with confirmed case',
+#       'Locally Acquired—no known contact','Interstate acquired', 'Under investigation'])
+# previous_data.columns = ['date', 'header', 'count']
+# previous_data['date'] = pd.to_datetime(previous_data['date'], format='%d/%m/%Y')
+# previous_data['date'] = previous_data['date'].dt.strftime('%d/%m/%Y')
 
 
+# for row in previous_data.index:
+# 	newRow = {}
+# 	newRow["header"] = previous_data.loc[row, 'header']
+# 	newRow["count"] = str(previous_data.loc[row,'count'])
+# 	newRow["date"] = previous_data.loc[row,'date']
+# 	# print(newRow)
+# 	scraperwiki.sqlite.save(unique_keys=["header","date"], data=newRow, table_name="source")
 
 
 # ### SCRAPE AND COMBINE INFECTION DATA
@@ -69,25 +67,3 @@ for row in hhs_table.index:
 	# print(newRow)
 	scraperwiki.sqlite.save(unique_keys=["header",'HHS',"date"], data=newRow, table_name="hhs_counts")
 
-
-
-
-
-### old stuff for sorting out tables 
-
-# previous = pd.read_csv(previous_data)
-# # historical = pd.read_csv(historical)
-# # historical.columns = ['date', 'Overseas acquired', 'Locally Acquired—close contact with confirmed case',
-# #        'Locally Acquired—no known contact','Interstate acquired', 'Under investigation']
-
-# # historical['Overseas acquired'] = historical['Overseas acquired'].str.replace(",", "")
-# # historical['Overseas acquired'] = pd.to_numeric(historical['Overseas acquired'])
-# # historical['Total cases'] = historical.sum(axis=1)
-
-
-# combo = previous.append(new)
-# combo['date'] = pd.to_datetime(combo['date'])
-# combo.drop_duplicates(subset=["date"], inplace=True)
-
-# with open(previous_data, "w") as f:
-# 	combo.to_csv(f, index=False, header=True)

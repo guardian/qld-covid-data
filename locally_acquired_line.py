@@ -5,6 +5,7 @@ from modules.numberFormat import numberFormat
 import numpy as np 
 import datetime
 
+#%%
 
 # Work out sixty days ago to truncate chart
 today = datetime.datetime.today()
@@ -14,13 +15,19 @@ chart_truncate =  sixty_ago.date()
 data = scraperwiki.sqlite.select("* from source")
 new = pd.DataFrame(data)
 
+old = pd.read_csv('qld-covid.csv')
+
+
 ## Pivot dataframe
 pivoted = new.pivot(index="date", columns="header")['count'].reset_index()
 pivoted = pivoted[['date', 'Interstate acquired',
        'Locally Acquired—close contact with confirmed case',
        'Locally Acquired—no known contact', 'Overseas acquired','Under investigation']]
-pivoted['date'] = pd.to_datetime(pivoted['date'])
+pivoted = pivoted.append(old)
+pivoted['date'] = pd.to_datetime(pivoted['date'], format="%d/%m/%Y")
 pivoted = pivoted.sort_values(by="date", ascending=True)
+
+#%%
 pivoted.columns = ['Date', 'Interstate', 'Local', 'Local unknown', 'Overseas', 'Under investigation']
 
 
@@ -30,8 +37,7 @@ pivoted['Local'] = pd.to_numeric(pivoted['Local'])
 pivoted['Local unknown'] = pd.to_numeric(pivoted['Local unknown'])
 pivoted['Under investigation'] = pd.to_numeric(pivoted['Under investigation'])
 
-
-
+#%%
 pivoted['Local & under investigation'] = pivoted['Local'] + pivoted['Local unknown'] + pivoted['Under investigation']
 
 ## Work out the difference in the cumulative figures and calculate rolling average
@@ -45,11 +51,11 @@ pivoted.loc[pivoted['New local & under investigation cases'] < 0, 'New local & u
 
 pivoted['Local & under investigation cases, 7 day rolling average'] = round(pivoted['New local & under investigation cases'].rolling(7).mean(),0)
 
-pivoted = pivoted[['Date', 'Overseas, 7 day rolling average', 'Local & under investigation cases, 7 day rolling average']]
+avg = pivoted[['Date', 'Overseas, 7 day rolling average', 'Local & under investigation cases, 7 day rolling average']]
 
-pivoted = pivoted.loc[pivoted['Date'] >= np.datetime64(chart_truncate)]
-pivoted['Date'] = pivoted['Date'].dt.strftime('%Y-%m-%d')
-last_date = pivoted.iloc[-1:]["Date"].values[0]
+avg = avg.loc[avg['Date'] >= np.datetime64(chart_truncate)]
+avg['Date'] = avg['Date'].dt.strftime('%Y-%m-%d')
+last_date = avg.iloc[-1:]["Date"].values[0]
 # print(pivoted)
 
 def makeTestingLine(df):
@@ -83,4 +89,4 @@ def makeTestingLine(df):
     yachtCharter(template=template, labels=labels, data=chartData, chartId=[{"type":"linechart"}], 
     options=[{"colorScheme":"guardian"}], chartName="qld_covid_locally_acquired_trend")
 
-makeTestingLine(pivoted)
+makeTestingLine(avg)
