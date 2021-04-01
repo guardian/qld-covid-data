@@ -50,7 +50,7 @@ pivoted = pivoted[['Date', 'Overseas, 7 day rolling average', 'Local & under inv
 pivoted = pivoted.loc[pivoted['Date'] >= np.datetime64(chart_truncate)]
 pivoted['Date'] = pivoted['Date'].dt.strftime('%Y-%m-%d')
 last_date = pivoted.iloc[-1:]["Date"].values[0]
-print(pivoted)
+# print(pivoted)
 
 def makeTestingLine(df):
 	

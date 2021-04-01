@@ -42,7 +42,7 @@ source_trs = dom.cssselect('#QLD_Cases_Sources_Of_Infection tr')
 source_date = dom.cssselect('#QLD_Cases_Sources_Of_Infection caption')[0].text.replace("Data as at ","").replace(". Refer to ", "")
 
 source_data = []
-print(source_date)
+# print(source_date)
 for tr in source_trs:
 	newRow = {}
 	newRow["header"] = tr.cssselect('th')[0].text

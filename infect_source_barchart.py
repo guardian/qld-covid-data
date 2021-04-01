@@ -30,7 +30,7 @@ for col in cols:
 # print(pivoted)
 
 last_date = pivoted.iloc[-1:]["Date"].values[0]
-print(last_date)
+# print(last_date)
 def makeTestingLine(df):
 	
     template = [
