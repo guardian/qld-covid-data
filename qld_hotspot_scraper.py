@@ -9,7 +9,11 @@ pd.set_option("display.max_rows", None, "display.max_columns", None)
 headers = {'user-agent': 'The Guardian'}
 html = requests.get('https://www.qld.gov.au/health/conditions/health-alerts/coronavirus-covid-19/current-status/contact-tracing', headers=headers).text
 tables = pd.read_html(html)
-table_labels = ["Close contact", "Casual contact", "Low risk contact"]
+table_labels = ["Close contact", "Historical casual contact", "Casual contact", "Low risk contact"]
+
+
+# print(tables[2])
+# print(len(tables))
 
 listo = []
 for i in range(0, len(table_labels)):
@@ -46,6 +50,7 @@ df = df[['Date', 'Place', 'Suburb', 'Arrival time', 'Departure time', 'Type']]
 # Drop blank row in casual contacts table
 df.dropna(inplace=True)
 
+
 # Parse times
 
 # df['Arrival sort'] = df['Arrival time'].apply(lambda x: pd.to_datetime(x.replace(" ", ''), format="%I.%M%p") if "." in x else pd.to_datetime(x, format="%I%p"))
@@ -53,7 +58,6 @@ df.dropna(inplace=True)
 
 # df['Arrival sort'] = df['Arrival sort'].dt.strftime("%H:%M")
 # df['Departure sort'] = df['Departure sort'].dt.strftime("%H:%M")
-
 
 with open(f"{data_path}/hotspots.csv", "w") as f:
     df.to_csv(f, index=False, header=True)
