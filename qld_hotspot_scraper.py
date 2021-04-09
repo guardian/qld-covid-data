@@ -3,14 +3,14 @@ import requests
 from modules.yachtCharter import yachtCharter
 import os
 import re
+
 data_path = os.path.dirname(__file__) 
 pd.set_option("display.max_rows", None, "display.max_columns", None)
 
 headers = {'user-agent': 'The Guardian'}
 html = requests.get('https://www.qld.gov.au/health/conditions/health-alerts/coronavirus-covid-19/current-status/contact-tracing', headers=headers).text
 tables = pd.read_html(html)
-table_labels = ["Close contact", "Historical casual contact", "Casual contact", "Low risk contact"]
-
+table_labels = ["Close contact", "Casual contact", "Historical casual contact"]
 
 # print(tables[2])
 # print(len(tables))
